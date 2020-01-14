@@ -30,7 +30,10 @@ namespace Full.Pirate.Library
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers(options=> {
+                options.ReturnHttpNotAcceptable = true; //only returns data in content type requested (like xml) or else error
+            }).AddXmlDataContractSerializerFormatters(); //can return data as xml
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IRepositoryService, RepositoryService>();
            

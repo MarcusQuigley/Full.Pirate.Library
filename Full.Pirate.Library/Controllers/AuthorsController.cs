@@ -2,6 +2,7 @@
 using AutoMapper;
 using Full.Pirate.Library.Models;
 using Full.Pirate.Library.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -25,11 +26,23 @@ namespace Full.Pirate.Library.Controllers
         }
 
 
-        public ActionResult<IEnumerable<AuthorDto>> Actors()
+        [HttpGet]
+        public ActionResult<IEnumerable<AuthorDto>> GetAuthors()
         {
             var authors = service.GetAuthors();
             var authorsDto = mapper.Map<IEnumerable<AuthorDto>>(authors);
             return Ok(authorsDto);
+        }
+        [HttpGet("{authorId}")]
+        public ActionResult<AuthorDto> GetAuthor(Guid authorId)
+        {
+            var author = service.GetAuthor(authorId);
+            if (author == null)
+            {
+                return NotFound();
+            }
+            return Ok(mapper.Map<AuthorDto>(author));
+
         }
     }
 }
