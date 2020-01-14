@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Full.Pirate.Library", "Full.Pirate.Library\Full.Pirate.Library.csproj", "{38F69EA5-8E94-4849-A8E4-4B123FC975AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Full.Pirate.Library", "Full.Pirate.Library\Full.Pirate.Library.csproj", "{38F69EA5-8E94-4849-A8E4-4B123FC975AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Full.Pirate.Library.Tests", "Full.Pirate.Library.Tests\Full.Pirate.Library.Tests.csproj", "{76FD2751-F4AC-45A8-B282-0B6205B7917E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{38F69EA5-8E94-4849-A8E4-4B123FC975AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38F69EA5-8E94-4849-A8E4-4B123FC975AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38F69EA5-8E94-4849-A8E4-4B123FC975AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76FD2751-F4AC-45A8-B282-0B6205B7917E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76FD2751-F4AC-45A8-B282-0B6205B7917E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76FD2751-F4AC-45A8-B282-0B6205B7917E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76FD2751-F4AC-45A8-B282-0B6205B7917E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
