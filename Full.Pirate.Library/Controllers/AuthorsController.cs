@@ -1,4 +1,6 @@
-﻿using Full.Pirate.Library.Entities;
+﻿
+using AutoMapper;
+using Full.Pirate.Library.Models;
 using Full.Pirate.Library.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,17 +15,21 @@ namespace Full.Pirate.Library.Controllers
     public class AuthorsController : ControllerBase
     {
         readonly IRepositoryService service;
+        readonly IMapper mapper;
 
-        public AuthorsController(IRepositoryService service)
+        public AuthorsController(IRepositoryService service,
+            IMapper mapper)
         {
             this.service = service;
+            this.mapper = mapper;
         }
 
 
-        public ActionResult<IEnumerable<Author>> Actors()
+        public ActionResult<IEnumerable<AuthorDto>> Actors()
         {
             var authors = service.GetAuthors();
-            return Ok(authors);
+            var authorsDto = mapper.Map<IEnumerable<AuthorDto>>(authors);
+            return Ok(authorsDto);
         }
     }
 }

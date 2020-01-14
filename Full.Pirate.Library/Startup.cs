@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Full.Pirate.Library.DbContexts;
 using Full.Pirate.Library.Services;
 using Microsoft.AspNetCore.Builder;
@@ -28,8 +29,11 @@ namespace Full.Pirate.Library
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddControllers();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IRepositoryService, RepositoryService>();
+           
             services.AddDbContext<PirateLibraryContext>(options =>
             {
                 var dbConnSection = Configuration.GetSection("ConnectionStrings");
