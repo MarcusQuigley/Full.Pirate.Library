@@ -61,13 +61,28 @@ namespace Full.Pirate.Library.Services
              return context.Authors;
         }
 
-        public IEnumerable<Author> GetAuthors(string mainCategory)
+        public IEnumerable<Author> GetAuthors(string mainCategory, string searchQuery)
         {
-            if (string.IsNullOrEmpty(mainCategory))
+            if (string.IsNullOrEmpty(mainCategory) && string.IsNullOrEmpty(searchQuery))
             {
                 return GetAuthors();
             }
-            return context.Authors.Where(a => a.MainCategory == mainCategory.Trim());
+            var query = context.Authors as IQueryable<Author>;
+            
+            if (!string.IsNullOrEmpty(mainCategory))
+            {
+                query = query.Where(a => a.MainCategory == mainCategory.Trim());
+            }
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                searchQuery = searchQuery.Trim();
+                query = query.Where(a => a.MainCategory.Contains(searchQuery)
+                                        || a.FirstName.Contains(searchQuery)
+                                        || a.LastName.Contains(searchQuery)
+                                    );
+            }
+
+            return query.ToList();
         }
 
         public bool Save()

@@ -27,9 +27,9 @@ namespace Full.Pirate.Library.Controllers
         
         [HttpGet]
         [HttpHead]
-        public ActionResult<IEnumerable<AuthorDto>> GetAuthors([FromQuery] string mainCategory)
+        public ActionResult<IEnumerable<AuthorDto>> GetAuthors([FromQuery] string mainCategory, string searchQuery)
         {
-            var authors = service.GetAuthors(mainCategory);
+            var authors = service.GetAuthors(mainCategory, searchQuery);
             var authorsDto = mapper.Map<IEnumerable<AuthorDto>>(authors);
             return Ok(authorsDto);
         }
