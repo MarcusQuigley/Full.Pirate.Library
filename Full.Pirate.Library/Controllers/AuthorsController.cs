@@ -27,6 +27,7 @@ namespace Full.Pirate.Library.Controllers
 
 
         [HttpGet]
+        [HttpHead]
         public ActionResult<IEnumerable<AuthorDto>> GetAuthors()
         {
             var authors = service.GetAuthors();
@@ -34,6 +35,7 @@ namespace Full.Pirate.Library.Controllers
             return Ok(authorsDto);
         }
         [HttpGet("{authorId}")]
+        [HttpHead("{authorId}")]
         public ActionResult<AuthorDto> GetAuthor(Guid authorId)
         {
             var author = service.GetAuthor(authorId);
