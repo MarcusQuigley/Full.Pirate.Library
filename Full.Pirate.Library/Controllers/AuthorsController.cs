@@ -1,5 +1,6 @@
 ﻿
 using AutoMapper;
+using Full.Pirate.Library.Entities;
 using Full.Pirate.Library.Models;
 using Full.Pirate.Library.SearchParams;
 using Full.Pirate.Library.Services;
@@ -35,7 +36,7 @@ namespace Full.Pirate.Library.Controllers
             return Ok(authorsDto);
         }
 
-        [HttpGet("{authorId}")]
+        [HttpGet("{authorId}",Name ="GetAuthor")]
         [HttpHead("{authorId}")]
         public ActionResult<AuthorDto> GetAuthor(Guid authorId)
         {
@@ -46,6 +47,41 @@ namespace Full.Pirate.Library.Controllers
             }
             return Ok(mapper.Map<AuthorDto>(author));
 
+        }
+
+        [HttpPost]
+        public ActionResult<AuthorDto> CreateAuthor(AuthorToCreateDto authorToCreate)
+        {
+            var authorEntity = mapper.Map<Author>(authorToCreate);
+            service.AddAuthor(authorEntity);
+            if (service.Save())
+            {
+                var authorDto = mapper.Map<AuthorDto>(authorEntity);
+ 
+                  return CreatedAtRoute("GetAuthor",new { authorId = authorDto.AuthorId }, authorDto);
+            }
+            return BadRequest();
+
+
+        }
+
+        [HttpGet]
+        [Route("unmapped")]
+        public ActionResult<IEnumerable<Author>> GetAuthorsAsEntities()
+        {
+            var authors = service.GetAuthors();
+            if (authors!=null)
+            {
+                if (authors.Count() > 1)
+                {
+                    return Ok(authors.Take(2));
+                }
+                else {
+                    return Ok(authors);
+                }
+            }
+            return BadRequest();
+            
         }
     }
 }
