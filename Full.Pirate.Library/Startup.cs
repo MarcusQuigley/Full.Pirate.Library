@@ -7,6 +7,7 @@ using Full.Pirate.Library.DbContexts;
 using Full.Pirate.Library.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,10 @@ namespace Full.Pirate.Library
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers(options=> {
+                options.ReturnHttpNotAcceptable = true; //only returns data in content type requested (like xml) or else error
+            }).AddXmlDataContractSerializerFormatters(); //can return data as xml
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IRepositoryService, RepositoryService>();
            
@@ -52,6 +56,16 @@ namespace Full.Pirate.Library
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler(configure=> {
+                    configure.Run(async handler =>
+                    {
+                        handler.Response.StatusCode = 500;
+                        await handler.Response.WriteAsync("AN error occured. Try again later");
+                    });
+                });
             }
 
             app.UseHttpsRedirection();

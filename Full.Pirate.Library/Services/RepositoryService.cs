@@ -1,5 +1,6 @@
 ﻿using Full.Pirate.Library.DbContexts;
 using Full.Pirate.Library.Entities;
+using Full.Pirate.Library.SearchParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +60,30 @@ namespace Full.Pirate.Library.Services
         public IEnumerable<Author> GetAuthors()
         {
              return context.Authors;
+        }
+
+        public IEnumerable<Author> GetAuthors(AuthorsResourceParameters authorParms) //string mainCategory, string searchQuery)
+        {
+            if (string.IsNullOrEmpty(authorParms.MainCategory) && string.IsNullOrEmpty(authorParms.SearchQuery))
+            {
+                return GetAuthors();
+            }
+            var query = context.Authors as IQueryable<Author>;
+            
+            if (!string.IsNullOrEmpty(authorParms.MainCategory))
+            {
+                query = query.Where(a => a.MainCategory == authorParms.MainCategory.Trim());
+            }
+            if (!string.IsNullOrEmpty(authorParms.SearchQuery))
+            {
+                var searchQuery = authorParms.SearchQuery.Trim();
+                query = query.Where(a => a.MainCategory.Contains(searchQuery)
+                                        || a.FirstName.Contains(searchQuery)
+                                        || a.LastName.Contains(searchQuery)
+                                    );
+            }
+
+            return query.ToList();
         }
 
         public bool Save()
