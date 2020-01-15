@@ -1,5 +1,6 @@
 ﻿using Full.Pirate.Library.DbContexts;
 using Full.Pirate.Library.Entities;
+using Full.Pirate.Library.SearchParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,21 +62,21 @@ namespace Full.Pirate.Library.Services
              return context.Authors;
         }
 
-        public IEnumerable<Author> GetAuthors(string mainCategory, string searchQuery)
+        public IEnumerable<Author> GetAuthors(AuthorsResourceParameters authorParms) //string mainCategory, string searchQuery)
         {
-            if (string.IsNullOrEmpty(mainCategory) && string.IsNullOrEmpty(searchQuery))
+            if (string.IsNullOrEmpty(authorParms.MainCategory) && string.IsNullOrEmpty(authorParms.SearchQuery))
             {
                 return GetAuthors();
             }
             var query = context.Authors as IQueryable<Author>;
             
-            if (!string.IsNullOrEmpty(mainCategory))
+            if (!string.IsNullOrEmpty(authorParms.MainCategory))
             {
-                query = query.Where(a => a.MainCategory == mainCategory.Trim());
+                query = query.Where(a => a.MainCategory == authorParms.MainCategory.Trim());
             }
-            if (!string.IsNullOrEmpty(searchQuery))
+            if (!string.IsNullOrEmpty(authorParms.SearchQuery))
             {
-                searchQuery = searchQuery.Trim();
+                var searchQuery = authorParms.SearchQuery.Trim();
                 query = query.Where(a => a.MainCategory.Contains(searchQuery)
                                         || a.FirstName.Contains(searchQuery)
                                         || a.LastName.Contains(searchQuery)

@@ -1,6 +1,7 @@
 ﻿
 using AutoMapper;
 using Full.Pirate.Library.Models;
+using Full.Pirate.Library.SearchParams;
 using Full.Pirate.Library.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,9 +28,9 @@ namespace Full.Pirate.Library.Controllers
         
         [HttpGet]
         [HttpHead]
-        public ActionResult<IEnumerable<AuthorDto>> GetAuthors([FromQuery] string mainCategory, string searchQuery)
+        public ActionResult<IEnumerable<AuthorDto>> GetAuthors([FromQuery]  AuthorsResourceParameters authorParms)
         {
-            var authors = service.GetAuthors(mainCategory, searchQuery);
+            var authors = service.GetAuthors(authorParms);
             var authorsDto = mapper.Map<IEnumerable<AuthorDto>>(authors);
             return Ok(authorsDto);
         }
