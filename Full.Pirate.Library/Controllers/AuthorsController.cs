@@ -24,16 +24,16 @@ namespace Full.Pirate.Library.Controllers
             this.service = service;
             this.mapper = mapper;
         }
-
-
+        
         [HttpGet]
         [HttpHead]
-        public ActionResult<IEnumerable<AuthorDto>> GetAuthors()
+        public ActionResult<IEnumerable<AuthorDto>> GetAuthors([FromQuery] string mainCategory)
         {
-            var authors = service.GetAuthors();
+            var authors = service.GetAuthors(mainCategory);
             var authorsDto = mapper.Map<IEnumerable<AuthorDto>>(authors);
             return Ok(authorsDto);
         }
+
         [HttpGet("{authorId}")]
         [HttpHead("{authorId}")]
         public ActionResult<AuthorDto> GetAuthor(Guid authorId)

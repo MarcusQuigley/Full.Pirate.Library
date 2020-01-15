@@ -11,7 +11,8 @@ namespace Full.Pirate.Library.Services
         bool AuthorExists(Guid authorId);
         Author GetAuthor(Guid authorId);
         IEnumerable<Author> GetAuthors();
-       // IEnumerable<Author> GetAuthors(AuthorsResourceParameters parms);
+        IEnumerable<Author> GetAuthors(string mainCategory);
+        // IEnumerable<Author> GetAuthors(AuthorsResourceParameters parms);
         void AddAuthor(Author author);
 
         void UpdateAuthor(Author author);

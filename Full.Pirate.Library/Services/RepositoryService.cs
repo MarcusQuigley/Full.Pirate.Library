@@ -61,6 +61,15 @@ namespace Full.Pirate.Library.Services
              return context.Authors;
         }
 
+        public IEnumerable<Author> GetAuthors(string mainCategory)
+        {
+            if (string.IsNullOrEmpty(mainCategory))
+            {
+                return GetAuthors();
+            }
+            return context.Authors.Where(a => a.MainCategory == mainCategory.Trim());
+        }
+
         public bool Save()
         {
            return(context.SaveChanges() >=0);
