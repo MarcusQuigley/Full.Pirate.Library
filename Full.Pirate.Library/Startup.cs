@@ -7,6 +7,7 @@ using Full.Pirate.Library.DbContexts;
 using Full.Pirate.Library.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +56,16 @@ namespace Full.Pirate.Library
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler(configure=> {
+                    configure.Run(async handler =>
+                    {
+                        handler.Response.StatusCode = 500;
+                        await handler.Response.WriteAsync("AN error occured. Try again later");
+                    });
+                });
             }
 
             app.UseHttpsRedirection();
