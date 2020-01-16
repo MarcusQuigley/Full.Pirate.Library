@@ -18,6 +18,15 @@ namespace Full.Pirate.Library.Services
 
         void UpdateAuthor(Author author);
         void DeleteAuthor(Author author);
+
+
+        Book GetBook(Guid authorId, Guid bookId);
+        IEnumerable<Book> GetBooks(Guid authorId);
+        void AddBook(Guid authorId, Book book);
+        void UpdateBook(Book book);
+        void DeleteBook(Book book);
+
+
         bool Save();
 
         int Count();

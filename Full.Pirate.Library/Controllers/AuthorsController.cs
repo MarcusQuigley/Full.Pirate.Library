@@ -23,8 +23,8 @@ namespace Full.Pirate.Library.Controllers
         public AuthorsController(IRepositoryService service,
             IMapper mapper)
         {
-            this.service = service;
-            this.mapper = mapper;
+            this.service = service ?? throw new ArgumentNullException(nameof(service));
+            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
         
         [HttpGet]
@@ -61,8 +61,6 @@ namespace Full.Pirate.Library.Controllers
                   return CreatedAtRoute("GetAuthor",new { authorId = authorDto.AuthorId }, authorDto);
             }
             return BadRequest();
-
-
         }
 
         [HttpGet]
