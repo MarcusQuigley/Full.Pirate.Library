@@ -81,5 +81,12 @@ namespace Full.Pirate.Library.Controllers
             return BadRequest();
             
         }
+
+        [HttpOptions]
+        public ActionResult<string> GetAuthorOptions()
+        {
+            Response.Headers.Add("Allow","GET, HEAD, OPTIONS, POST");
+            return Ok();
+        }
     }
 }

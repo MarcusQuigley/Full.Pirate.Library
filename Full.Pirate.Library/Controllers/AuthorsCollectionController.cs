@@ -50,8 +50,6 @@ namespace Full.Pirate.Library.Controllers
             {
                 return BadRequest();
             }
-            //var authorDtoCreatedList = new List<AuthorDto>();
-            //var routeList = new List<CreatedAtRouteResult>();
             var authorEntities = mapper.Map<IEnumerable<Entities.Author>>(authors);
             foreach (var authorToCreate in authorEntities)
             {
@@ -60,24 +58,13 @@ namespace Full.Pirate.Library.Controllers
             service.Save();
 
             var authorsDtos = mapper.Map<IEnumerable<AuthorDto>>(authorEntities);
-            //if (service.Save())
-            //{
-            //    var authorDto = mapper.Map<AuthorDto>(author);
-            //    authorDtoCreatedList.Add(authorDto);
-            //    routeList.Add(new CreatedAtRouteResult("GetAuthors", new { authorId = authorDto.AuthorId }, authorDto));
-            //}
-            //}
 
             var idsAsString = string.Join(",", authorsDtos.Select(aDto => aDto.AuthorId));
 
             return CreatedAtRoute(
                 "GetAuthors",
-                new
-                {
-                    ids = idsAsString
-                },
+                new { ids = idsAsString },
                 authorsDtos);
-            //return Ok( );
         }
     }
 }
