@@ -119,6 +119,18 @@ namespace Full.Pirate.Library.Services
             return query.ToList();
         }
 
+
+        public IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds)
+        {
+            if (authorIds == null)
+            {
+                throw new ArgumentNullException(nameof(authorIds));
+            }
+            var authors = authorIds.Select(id => context.Authors.SingleOrDefault(i => i.AuthorId == id))
+                                    .ToArray();
+            return authors;
+        }
+
         public Book GetBook(Guid authorId, Guid bookId)
         {
            if (authorId == Guid.Empty)

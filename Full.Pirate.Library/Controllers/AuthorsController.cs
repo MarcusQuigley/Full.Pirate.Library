@@ -50,7 +50,7 @@ namespace Full.Pirate.Library.Controllers
         }
 
         [HttpPost]
-        public ActionResult<AuthorDto> CreateAuthor(AuthorToCreateDto authorToCreate)
+        public ActionResult<AuthorDto> CreateAuthor([FromBody] AuthorToCreateDto authorToCreate)
         {
             var authorEntity = mapper.Map<Author>(authorToCreate);
             service.AddAuthor(authorEntity);
