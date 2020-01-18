@@ -109,11 +109,26 @@ namespace Full.Pirate.Library.Controllers
             return BadRequest();
 
         }
+        [HttpDelete("{authorId}")]
+        public ActionResult DeleteAuthor(Guid authorId)
+        {
+            var author = service.GetAuthor(authorId);
+            if (author==null)
+            {
+                return NotFound();
+            }
+            service.DeleteAuthor(author);
+            if (service.Save())
+            {
+                return NoContent();
+            }
+            return BadRequest();
+        }
 
         [HttpOptions]
         public ActionResult<string> GetAuthorOptions()
         {
-            Response.Headers.Add("Allow","GET, HEAD, OPTIONS, POST, PATCH");
+            Response.Headers.Add("Allow","DELETE, GET, HEAD, OPTIONS, POST, PATCH");
             return Ok();
         }
     }

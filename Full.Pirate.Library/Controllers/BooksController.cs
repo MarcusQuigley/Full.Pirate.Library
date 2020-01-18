@@ -83,5 +83,33 @@ namespace Full.Pirate.Library.Controllers
             }
             return BadRequest(); // InternalServerErrorResult()
         }
+
+        [HttpDelete("{bookId}")]
+        public ActionResult DeleteBook(Guid authorId, Guid bookId)
+        {
+            
+            if (!service.AuthorExists(authorId))
+            {
+                return NotFound();
+            }
+            var book = service.GetBook(authorId, bookId);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            service.DeleteBook(book);
+            if (service.Save())
+            {
+                return NoContent();
+            }
+            return BadRequest();
+        }
+
+        [HttpOptions]
+        public ActionResult GetOptions()
+        {
+            this.Response.Headers.Add("Action", "GET, DELETE, POST");
+            return Ok();
+        }
     }
 }
