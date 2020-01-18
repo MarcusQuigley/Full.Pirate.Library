@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
 
 namespace Full.Pirate.Library
 {
@@ -52,11 +53,18 @@ namespace Full.Pirate.Library
             services.AddControllers(options =>
             {
                 options.ReturnHttpNotAcceptable = true; //only returns data in content type requested (like xml) or else error
-            }).AddXmlDataContractSerializerFormatters() //can return data as xml
+             })
             .ConfigureApiBehaviorOptions(setupAction =>
             {
-                setupAction.InvalidModelStateResponseFactory = context => ValidationErrorData(context);
-            });
+                setupAction.InvalidModelStateResponseFactory = 
+                context => ValidationErrorData(context);
+            })
+            .AddNewtonsoftJson(setupAction => //use camel case in patch document
+            {
+                setupAction.SerializerSettings.ContractResolver =
+                   new CamelCasePropertyNamesContractResolver();
+            }).AddXmlDataContractSerializerFormatters() //can return data as xml
+            ;
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IRepositoryService, RepositoryService>();

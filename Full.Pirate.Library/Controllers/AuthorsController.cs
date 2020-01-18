@@ -5,6 +5,7 @@ using Full.Pirate.Library.Models;
 using Full.Pirate.Library.SearchParams;
 using Full.Pirate.Library.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -82,10 +83,37 @@ namespace Full.Pirate.Library.Controllers
             
         }
 
+        [HttpPatch("{authorId}")]
+        public ActionResult PatchAuthor(Guid authorId, JsonPatchDocument<AuthorToCreateDto> authorClient)
+        {
+            var author = service.GetAuthor(authorId);
+            if (author == null)
+            {
+                return NotFound();
+            }
+            var authorToPatch = mapper.Map<AuthorToCreateDto>(author);
+
+            authorClient.ApplyTo(authorToPatch, ModelState);
+
+
+            if (!TryValidateModel(authorToPatch))
+            {
+                return ValidationProblem(this.ModelState);
+            }
+               author = mapper.Map<Author>(authorToPatch);
+            service.UpdateAuthor(author);
+            if (service.Save())
+            {
+                return NoContent();
+            }
+            return BadRequest();
+
+        }
+
         [HttpOptions]
         public ActionResult<string> GetAuthorOptions()
         {
-            Response.Headers.Add("Allow","GET, HEAD, OPTIONS, POST");
+            Response.Headers.Add("Allow","GET, HEAD, OPTIONS, POST, PATCH");
             return Ok();
         }
     }
