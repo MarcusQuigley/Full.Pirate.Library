@@ -20,7 +20,8 @@ namespace Full.Pirate.Library.MapperProfiles
                     source => source.MapFrom(s=>s.DateOfBirth.GetAge())
                 );
 
-            CreateMap<Models.AuthorToCreateDto, Entities.Author>();
+            CreateMap<Models.AuthorToCreateDto, Entities.Author>()
+                .ReverseMap();
         }
     }
 }
