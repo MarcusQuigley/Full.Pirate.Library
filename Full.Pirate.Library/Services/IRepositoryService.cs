@@ -13,11 +13,21 @@ namespace Full.Pirate.Library.Services
         Author GetAuthor(Guid authorId);
         IEnumerable<Author> GetAuthors();
         IEnumerable<Author> GetAuthors(AuthorsResourceParameters authorParms);//string mainCategory, string searchQuery);
-        // IEnumerable<Author> GetAuthors(AuthorsResourceParameters parms);
+ 
+         IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds);
         void AddAuthor(Author author);
 
         void UpdateAuthor(Author author);
         void DeleteAuthor(Author author);
+
+
+        Book GetBook(Guid authorId, Guid bookId);
+        IEnumerable<Book> GetBooks(Guid authorId);
+        void AddBook(Guid authorId, Book book);
+        void UpdateBook(Book book);
+        void DeleteBook(Book book);
+
+
         bool Save();
 
         int Count();

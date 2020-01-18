@@ -1,5 +1,6 @@
 ﻿
 using AutoMapper;
+using Full.Pirate.Library.Entities;
 using Full.Pirate.Library.Models;
 using Full.Pirate.Library.SearchParams;
 using Full.Pirate.Library.Services;
@@ -22,8 +23,8 @@ namespace Full.Pirate.Library.Controllers
         public AuthorsController(IRepositoryService service,
             IMapper mapper)
         {
-            this.service = service;
-            this.mapper = mapper;
+            this.service = service ?? throw new ArgumentNullException(nameof(service));
+            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
         
         [HttpGet]
@@ -35,7 +36,7 @@ namespace Full.Pirate.Library.Controllers
             return Ok(authorsDto);
         }
 
-        [HttpGet("{authorId}")]
+        [HttpGet("{authorId}",Name ="GetAuthor")]
         [HttpHead("{authorId}")]
         public ActionResult<AuthorDto> GetAuthor(Guid authorId)
         {
@@ -46,6 +47,46 @@ namespace Full.Pirate.Library.Controllers
             }
             return Ok(mapper.Map<AuthorDto>(author));
 
+        }
+
+        [HttpPost]
+        public ActionResult<AuthorDto> CreateAuthor([FromBody] AuthorToCreateDto authorToCreate)
+        {
+            var authorEntity = mapper.Map<Author>(authorToCreate);
+            service.AddAuthor(authorEntity);
+            if (service.Save())
+            {
+                var authorDto = mapper.Map<AuthorDto>(authorEntity);
+ 
+                  return CreatedAtRoute("GetAuthor",new { authorId = authorDto.AuthorId }, authorDto);
+            }
+            return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("unmapped")]
+        public ActionResult<IEnumerable<Author>> GetAuthorsAsEntities()
+        {
+            var authors = service.GetAuthors();
+            if (authors!=null)
+            {
+                if (authors.Count() > 1)
+                {
+                    return Ok(authors.Take(2));
+                }
+                else {
+                    return Ok(authors);
+                }
+            }
+            return BadRequest();
+            
+        }
+
+        [HttpOptions]
+        public ActionResult<string> GetAuthorOptions()
+        {
+            Response.Headers.Add("Allow","GET, HEAD, OPTIONS, POST");
+            return Ok();
         }
     }
 }

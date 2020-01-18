@@ -17,7 +17,7 @@ namespace Full.Pirate.Library.DbContexts
         }
 
         public DbSet<Author> Authors { get; set; }
-        public DbSet<Book> Book { get; set; }
+        public DbSet<Book> Books { get; set; }
 
 
     }
