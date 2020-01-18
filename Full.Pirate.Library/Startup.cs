@@ -27,13 +27,36 @@ namespace Full.Pirate.Library
 
         public IConfiguration Configuration { get; }
 
+        private IActionResult ValidationErrorData(ActionContext context)
+        {
+           var problemDetails = new ValidationProblemDetails(context.ModelState)
+           {
+               Status = StatusCodes.Status422UnprocessableEntity,
+               Instance = context.HttpContext.Request.Path,
+               Type = "https://piratelibrary.com/modelvalidationproblem",
+               Title = "One or more validation errors occurred.",
+               Detail = "Shit, fix it."
+
+           };
+            problemDetails.Extensions.Add("traceId", context.HttpContext.TraceIdentifier);
+            return new UnprocessableEntityObjectResult(problemDetails)
+            {
+                ContentTypes = { "application/problem+json" }
+            };
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers(options=> {
+            services.AddControllers(options =>
+            {
                 options.ReturnHttpNotAcceptable = true; //only returns data in content type requested (like xml) or else error
-            }).AddXmlDataContractSerializerFormatters(); //can return data as xml
+            }).AddXmlDataContractSerializerFormatters() //can return data as xml
+            .ConfigureApiBehaviorOptions(setupAction =>
+            {
+                setupAction.InvalidModelStateResponseFactory = context => ValidationErrorData(context);
+            });
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IRepositoryService, RepositoryService>();
