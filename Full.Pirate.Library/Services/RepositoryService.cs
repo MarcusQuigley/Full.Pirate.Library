@@ -95,12 +95,8 @@ namespace Full.Pirate.Library.Services
              return context.Authors;
         }
 
-        public IEnumerable<Author> GetAuthors(AuthorsResourceParameters authorParms) //string mainCategory, string searchQuery)
+        public IEnumerable<Author> GetAuthors(AuthorsResourceParameters authorParms) 
         {
-            if (string.IsNullOrEmpty(authorParms.MainCategory) && string.IsNullOrEmpty(authorParms.SearchQuery))
-            {
-                return GetAuthors();
-            }
             var query = context.Authors as IQueryable<Author>;
             
             if (!string.IsNullOrEmpty(authorParms.MainCategory))
@@ -116,9 +112,11 @@ namespace Full.Pirate.Library.Services
                                     );
             }
 
-            return query.ToList();
+            return query
+                .Skip(authorParms.PageSize * (authorParms.PageNumber - 1))
+                .Take(authorParms.PageSize)
+                .ToList();
         }
-
 
         public IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds)
         {
