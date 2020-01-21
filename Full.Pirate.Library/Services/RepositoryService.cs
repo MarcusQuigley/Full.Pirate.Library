@@ -1,5 +1,6 @@
 ﻿using Full.Pirate.Library.DbContexts;
 using Full.Pirate.Library.Entities;
+using Full.Pirate.Library.Helpers;
 using Full.Pirate.Library.SearchParams;
 using System;
 using System.Collections.Generic;
@@ -95,12 +96,8 @@ namespace Full.Pirate.Library.Services
              return context.Authors;
         }
 
-        public IEnumerable<Author> GetAuthors(AuthorsResourceParameters authorParms) //string mainCategory, string searchQuery)
+        public PagedList<Author> GetAuthors(AuthorsResourceParameters authorParms) 
         {
-            if (string.IsNullOrEmpty(authorParms.MainCategory) && string.IsNullOrEmpty(authorParms.SearchQuery))
-            {
-                return GetAuthors();
-            }
             var query = context.Authors as IQueryable<Author>;
             
             if (!string.IsNullOrEmpty(authorParms.MainCategory))
@@ -115,10 +112,10 @@ namespace Full.Pirate.Library.Services
                                         || a.LastName.Contains(searchQuery)
                                     );
             }
-
-            return query.ToList();
-        }
-
+            return PagedList<Author>.Create(query, 
+                authorParms.PageNumber, 
+                authorParms.PageSize);
+         }
 
         public IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds)
         {

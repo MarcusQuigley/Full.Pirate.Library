@@ -30,7 +30,8 @@ namespace Full.Pirate.Library.Controllers
         
         [HttpGet]
         [HttpHead]
-        public ActionResult<IEnumerable<AuthorDto>> GetAuthors([FromQuery]  AuthorsResourceParameters authorParms)
+        public ActionResult<IEnumerable<AuthorDto>> GetAuthors(
+            [FromQuery]  AuthorsResourceParameters authorParms)
         {
             var authors = service.GetAuthors(authorParms);
             var authorsDto = mapper.Map<IEnumerable<AuthorDto>>(authors);
