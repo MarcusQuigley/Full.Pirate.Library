@@ -22,7 +22,7 @@ namespace Full.Pirate.Library.Controllers
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        [HttpGet("({ids})", Name = "GetAuthors")]
+        [HttpGet("({ids})", Name = "GetAuthorsCollection")]
         public ActionResult<IEnumerable<AuthorDto>> GetAuthorCollection(
             [FromRoute]
             [ModelBinder(typeof(ArrayModelBinding))] IEnumerable<Guid> ids)
@@ -62,7 +62,7 @@ namespace Full.Pirate.Library.Controllers
             var idsAsString = string.Join(",", authorsDtos.Select(aDto => aDto.AuthorId));
 
             return CreatedAtRoute(
-                "GetAuthors",
+                "GetAuthorsCollection",
                 new { ids = idsAsString },
                 authorsDtos);
         }
