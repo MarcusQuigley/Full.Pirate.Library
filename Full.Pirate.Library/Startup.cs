@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Full.Pirate.Library.DbContexts;
 using Full.Pirate.Library.Services;
+using Full.Pirate.Library.Services.Sorting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -65,7 +66,7 @@ namespace Full.Pirate.Library
                    new CamelCasePropertyNamesContractResolver();
             }).AddXmlDataContractSerializerFormatters() //can return data as xml
             ;
-
+            services.AddTransient<IPropertyMappingService, PropertyMappingService>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IRepositoryService, RepositoryService>();
            

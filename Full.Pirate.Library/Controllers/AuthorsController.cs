@@ -5,6 +5,7 @@ using Full.Pirate.Library.Helpers;
 using Full.Pirate.Library.Models;
 using Full.Pirate.Library.SearchParams;
 using Full.Pirate.Library.Services;
+using Full.Pirate.Library.Services.Sorting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -22,23 +23,31 @@ namespace Full.Pirate.Library.Controllers
     public class AuthorsController : ControllerBase
     {
         readonly IRepositoryService service;
+        readonly IPropertyMappingService propertyMappingService;
         readonly IMapper mapper;
 
         public AuthorsController(IRepositoryService service,
+            IPropertyMappingService propertyMappingService,
             IMapper mapper)
         {
             this.service = service ?? throw new ArgumentNullException(nameof(service));
+            this.propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
-        
-        [HttpGet(Name ="GetAuthors")]
+
+        [HttpGet(Name = "GetAuthors")]
         [HttpHead]
         public ActionResult<IEnumerable<AuthorDto>> GetAuthors(
             [FromQuery]  AuthorsResourceParameters authorParms)
         {
+            if (!propertyMappingService.ValidMappingExistsFor<Models.AuthorDto, Author>
+                (authorParms.OrderBy))
+            {
+                return BadRequest();
+            }
             var authors = service.GetAuthors(authorParms);
 
-            this.Response.Headers.Add("X-Pagination", CreatePaginationHeader(authors,authorParms));
+            this.Response.Headers.Add("X-Pagination", CreatePaginationHeader(authors, authorParms));
             return Ok(mapper.Map<IEnumerable<AuthorDto>>(authors));
         }
  
