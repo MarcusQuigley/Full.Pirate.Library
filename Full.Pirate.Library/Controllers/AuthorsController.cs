@@ -1,6 +1,7 @@
 ﻿
 using AutoMapper;
 using Full.Pirate.Library.Entities;
+using Full.Pirate.Library.Helpers;
 using Full.Pirate.Library.Models;
 using Full.Pirate.Library.SearchParams;
 using Full.Pirate.Library.Services;
@@ -36,51 +37,11 @@ namespace Full.Pirate.Library.Controllers
             [FromQuery]  AuthorsResourceParameters authorParms)
         {
             var authors = service.GetAuthors(authorParms);
-            var previousPageLink = authors.HasPrevious ?
-                (CreateAuthorsResourceUri(authorParms, ResourceUriType.PreviousPage)) : null;
-            var nextPageLinkLink = authors.HasNext ?
-                (CreateAuthorsResourceUri(authorParms, ResourceUriType.NextPage)) : null;
-            var paginationMetadata = new
-            {
-                totalCount = authors.TotalCount,
-                pageSize = authors.PageSize,
-                CurrentPage = authors.CurrentPage,
-                TotalPages = authors.TotalPages,
-                previousPageLink,
-                nextPageLinkLink
-            };
-             
-           
-            this.Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+
+            this.Response.Headers.Add("X-Pagination", CreatePaginationHeader(authors,authorParms));
             return Ok(mapper.Map<IEnumerable<AuthorDto>>(authors));
         }
-
-
-        private string CreateAuthorsResourceUri(AuthorsResourceParameters authorsParams, ResourceUriType type)
-        {
-            int pageNumber = authorsParams.PageNumber;
-            switch (type)
-            {
-                case ResourceUriType.PreviousPage:
-                    pageNumber -= 1;
-                    break;
-                case ResourceUriType.NextPage:
-                    pageNumber += 1;
-                    break;
-                default:
-                    break;
-            }
-            return Url.Link("GetAuthors",
-                new
-                {
-                    pageNumber = pageNumber,
-                    pageSize = authorsParams.PageSize,
-                    mainCategory = authorsParams.MainCategory,
-                    searchQuery = authorsParams.SearchQuery
-                });
-
-        }
-
+ 
         [HttpGet("{authorId}",Name ="GetAuthor")]
         [HttpHead("{authorId}")]
         public ActionResult<AuthorDto> GetAuthor(Guid authorId)
@@ -91,8 +52,7 @@ namespace Full.Pirate.Library.Controllers
                 return NotFound();
             }
             return Ok(mapper.Map<AuthorDto>(author));
-
-        }
+         }
 
         [HttpPost]
         public ActionResult<AuthorDto> CreateAuthor([FromBody] AuthorToCreateDto authorToCreate)
@@ -124,8 +84,7 @@ namespace Full.Pirate.Library.Controllers
                 }
             }
             return BadRequest();
-            
-        }
+         }
 
         [HttpPatch("{authorId}")]
         public ActionResult PatchAuthor(Guid authorId, JsonPatchDocument<AuthorToCreateDto> authorClient)
@@ -138,8 +97,7 @@ namespace Full.Pirate.Library.Controllers
             var authorToPatch = mapper.Map<AuthorToCreateDto>(author);
 
             authorClient.ApplyTo(authorToPatch, ModelState);
-
-
+ 
             if (!TryValidateModel(authorToPatch))
             {
                 return ValidationProblem(this.ModelState);
@@ -151,8 +109,8 @@ namespace Full.Pirate.Library.Controllers
                 return NoContent();
             }
             return BadRequest();
-
-        }
+         }
+       
         [HttpDelete("{authorId}")]
         public ActionResult DeleteAuthor(Guid authorId)
         {
@@ -174,6 +132,49 @@ namespace Full.Pirate.Library.Controllers
         {
             Response.Headers.Add("Allow","DELETE, GET, HEAD, OPTIONS, POST, PATCH");
             return Ok();
+        }
+
+        private string CreatePaginationHeader(PagedList<Author> authors, AuthorsResourceParameters authorParms)
+        {
+            var previousPageLink = authors.HasPrevious ?
+                (CreateAuthorsResourceUri(authorParms, ResourceUriType.PreviousPage)) : null;
+            var nextPageLinkLink = authors.HasNext ?
+                (CreateAuthorsResourceUri(authorParms, ResourceUriType.NextPage)) : null;
+            var paginationMetadata = new
+            {
+                totalCount = authors.TotalCount,
+                pageSize = authors.PageSize,
+                CurrentPage = authors.CurrentPage,
+                TotalPages = authors.TotalPages,
+                previousPageLink,
+                nextPageLinkLink
+            };
+
+            return JsonSerializer.Serialize(paginationMetadata);
+        }
+
+        private string CreateAuthorsResourceUri(AuthorsResourceParameters authorsParams, ResourceUriType type)
+        {
+            int pageNumber = authorsParams.PageNumber;
+            switch (type)
+            {
+                case ResourceUriType.PreviousPage:
+                    pageNumber -= 1;
+                    break;
+                case ResourceUriType.NextPage:
+                    pageNumber += 1;
+                    break;
+                default:
+                    break;
+            }
+            return Url.Link("GetAuthors",
+                new
+                {
+                    pageNumber = pageNumber,
+                    pageSize = authorsParams.PageSize,
+                    mainCategory = authorsParams.MainCategory,
+                    searchQuery = authorsParams.SearchQuery
+                });
         }
     }
 }
