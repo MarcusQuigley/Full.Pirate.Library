@@ -12,7 +12,9 @@ using Microsoft.AspNetCore.Mvc;
  
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -25,19 +27,22 @@ namespace Full.Pirate.Library.Controllers
         readonly IRepositoryService service;
         readonly IPropertyMappingService propertyMappingService;
         readonly IMapper mapper;
+        readonly IDataShapeValidator dataShapeValidator;
 
         public AuthorsController(IRepositoryService service,
             IPropertyMappingService propertyMappingService,
-            IMapper mapper)
+            IMapper mapper,
+            IDataShapeValidator dataShapeValidator)
         {
             this.service = service ?? throw new ArgumentNullException(nameof(service));
             this.propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            this.dataShapeValidator = dataShapeValidator ?? throw new ArgumentNullException(nameof(dataShapeValidator));
         }
 
         [HttpGet(Name = "GetAuthors")]
         [HttpHead]
-        public ActionResult<IEnumerable<AuthorDto>> GetAuthors(
+        public IActionResult GetAuthors(
             [FromQuery]  AuthorsResourceParameters authorParms)
         {
             if (!propertyMappingService.ValidMappingExistsFor<Models.AuthorDto, Author>
@@ -45,10 +50,14 @@ namespace Full.Pirate.Library.Controllers
             {
                 return BadRequest();
             }
-            var authors = service.GetAuthors(authorParms);
+            if (!dataShapeValidator.CheckFieldsExist<Author>(authorParms.Fields))
+            {
+                return BadRequest();
+            }
+            var authors =  service.GetAuthors(authorParms);
 
             this.Response.Headers.Add("X-Pagination", CreatePaginationHeader(authors, authorParms));
-            return Ok(mapper.Map<IEnumerable<AuthorDto>>(authors));
+            return Ok(mapper.Map<IEnumerable<AuthorDto>>(authors).ShapeData(authorParms.Fields));
         }
  
         [HttpGet("{authorId}",Name ="GetAuthor")]
@@ -151,6 +160,7 @@ namespace Full.Pirate.Library.Controllers
                 (CreateAuthorsResourceUri(authorParms, ResourceUriType.NextPage)) : null;
             var paginationMetadata = new
             {
+                Fields = authorParms.Fields,
                 totalCount = authors.TotalCount,
                 pageSize = authors.PageSize,
                 CurrentPage = authors.CurrentPage,
@@ -185,5 +195,6 @@ namespace Full.Pirate.Library.Controllers
                     searchQuery = authorsParams.SearchQuery
                 });
         }
+ 
     }
 }

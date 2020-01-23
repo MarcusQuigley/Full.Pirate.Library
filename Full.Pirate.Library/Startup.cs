@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Full.Pirate.Library.DbContexts;
+using Full.Pirate.Library.Helpers;
 using Full.Pirate.Library.Services;
 using Full.Pirate.Library.Services.Sorting;
 using Microsoft.AspNetCore.Builder;
@@ -67,6 +68,7 @@ namespace Full.Pirate.Library
             }).AddXmlDataContractSerializerFormatters() //can return data as xml
             ;
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
+            services.AddSingleton<IDataShapeValidator, DataShapeValidator>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IRepositoryService, RepositoryService>();
            
