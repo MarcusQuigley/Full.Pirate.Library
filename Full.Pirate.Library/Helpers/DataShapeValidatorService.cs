@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Full.Pirate.Library.Helpers
 {
-    public class DataShapeValidator : IDataShapeValidator
+    public class DataShapeValidatorService : IDataShapeValidatorService
     {
         public bool CheckFieldsExist<T>(string fields)
         {
@@ -17,7 +17,7 @@ namespace Full.Pirate.Library.Helpers
             var repositoryType = typeof(T);
             foreach (var field in fields.Split(','))
             {
-                if (repositoryType.GetProperty(field.Trim(), BindingFlags.Instance | BindingFlags.Public) == null)
+                if (repositoryType.GetProperty(field.Trim(), BindingFlags.Instance | BindingFlags.Public|BindingFlags.IgnoreCase) == null)
                 {
                     return false;
                 }

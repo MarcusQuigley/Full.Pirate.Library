@@ -68,7 +68,7 @@ namespace Full.Pirate.Library
             }).AddXmlDataContractSerializerFormatters() //can return data as xml
             ;
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
-            services.AddSingleton<IDataShapeValidator, DataShapeValidator>();
+            services.AddSingleton<IDataShapeValidatorService, DataShapeValidatorService>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IRepositoryService, RepositoryService>();
            

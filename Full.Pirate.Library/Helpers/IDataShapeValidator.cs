@@ -1,6 +1,6 @@
 ﻿namespace Full.Pirate.Library.Helpers
 {
-    public interface IDataShapeValidator
+    public interface IDataShapeValidatorService
     {
         bool CheckFieldsExist<T>(string fields);
     }

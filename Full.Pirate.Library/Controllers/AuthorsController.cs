@@ -27,17 +27,17 @@ namespace Full.Pirate.Library.Controllers
         readonly IRepositoryService service;
         readonly IPropertyMappingService propertyMappingService;
         readonly IMapper mapper;
-        readonly IDataShapeValidator dataShapeValidator;
+        readonly IDataShapeValidatorService dataShapeValidatorService;
 
         public AuthorsController(IRepositoryService service,
             IPropertyMappingService propertyMappingService,
             IMapper mapper,
-            IDataShapeValidator dataShapeValidator)
+            IDataShapeValidatorService dataShapeValidator)
         {
             this.service = service ?? throw new ArgumentNullException(nameof(service));
             this.propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            this.dataShapeValidator = dataShapeValidator ?? throw new ArgumentNullException(nameof(dataShapeValidator));
+            this.dataShapeValidatorService = dataShapeValidator ?? throw new ArgumentNullException(nameof(dataShapeValidator));
         }
 
         [HttpGet(Name = "GetAuthors")]
@@ -50,7 +50,7 @@ namespace Full.Pirate.Library.Controllers
             {
                 return BadRequest();
             }
-            if (!dataShapeValidator.CheckFieldsExist<Author>(authorParms.Fields))
+            if (!dataShapeValidatorService.CheckFieldsExist<AuthorDto>(authorParms.Fields))
             {
                 return BadRequest();
             }
@@ -62,14 +62,18 @@ namespace Full.Pirate.Library.Controllers
  
         [HttpGet("{authorId}",Name ="GetAuthor")]
         [HttpHead("{authorId}")]
-        public ActionResult<AuthorDto> GetAuthor(Guid authorId)
+        public ActionResult<AuthorDto> GetAuthor(Guid authorId, string fields)
         {
+            if (!dataShapeValidatorService.CheckFieldsExist<AuthorDto>(fields))
+            {
+                return BadRequest();
+            }
             var author = service.GetAuthor(authorId);
             if (author == null)
             {
                 return NotFound();
             }
-            return Ok(mapper.Map<AuthorDto>(author));
+            return Ok(mapper.Map<AuthorDto>(author).ShapeData(fields));
          }
 
         [HttpPost]
