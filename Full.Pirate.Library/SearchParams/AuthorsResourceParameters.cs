@@ -19,6 +19,7 @@ namespace Full.Pirate.Library.SearchParams
                 pageSize = (value > maxPageSize)?maxPageSize:value;
             }
         }
-        public string OrderBy { get; set; }
+        public string OrderBy { get; set; } = "Name";
+        public string Fields { get; set; }
     }
 }
