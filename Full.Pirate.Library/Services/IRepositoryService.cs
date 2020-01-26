@@ -13,9 +13,12 @@ namespace Full.Pirate.Library.Services
         bool AuthorExists(Guid authorId);
         Author GetAuthor(Guid authorId);
         IEnumerable<Author> GetAuthors();
-        PagedList<Author> GetAuthors(AuthorsResourceParameters authorParms);//string mainCategory, string searchQuery);
- 
-         IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds);
+        PagedList<Author> GetAuthors(AuthorsResourceParameters authorParms);
+        Task<Author> GetAuthorAsync(Guid authorId);
+        Task<PagedList<Author>> GetAuthorsAsync(AuthorsResourceParameters authorParms);
+        //PagedList<Author> GetAuthors(AuthorsResourceParameters authorParms);
+        
+        IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds);
         void AddAuthor(Author author);
 
         void UpdateAuthor(Author author);

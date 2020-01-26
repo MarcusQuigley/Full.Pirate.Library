@@ -3,15 +3,17 @@ using Full.Pirate.Library.Entities;
 using Full.Pirate.Library.Helpers;
 using Full.Pirate.Library.SearchParams;
 using Full.Pirate.Library.Services.Sorting;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Full.Pirate.Library.Services
 {
-    public class RepositoryService : IRepositoryService
+    public class RepositoryService : IRepositoryService, IDisposable
     {
-        readonly PirateLibraryContext context;
+          PirateLibraryContext context;
         readonly IPropertyMappingService propertyMappingService;
         public RepositoryService(PirateLibraryContext context , IPropertyMappingService propertyMappingService)
         {
@@ -84,7 +86,14 @@ namespace Full.Pirate.Library.Services
             }
             context.Books.Remove(book);
         }
-
+        public async Task<Author> GetAuthorAsync(Guid authorId)
+        {
+            if (authorId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(authorId));
+            }
+            return  await context.Authors.SingleOrDefaultAsync(a => a.AuthorId == authorId);
+        }
         public Author GetAuthor(Guid authorId)
         {
             if (authorId == Guid.Empty)
@@ -96,11 +105,16 @@ namespace Full.Pirate.Library.Services
 
         public IEnumerable<Author> GetAuthors()
         {
-             return context.Authors;
+            return context.Authors;
+        }
+        public async Task<IEnumerable<Author>> GetAuthorsAsync()
+        {
+            return await context.Authors.ToArrayAsync();
         }
 
-        public PagedList<Author> GetAuthors(AuthorsResourceParameters authorParms)
+        public  PagedList<Author> GetAuthors(AuthorsResourceParameters authorParms)
         {
+            context.Database.ExecuteSqlCommand("WAITFOR DELAY '00:00:02';");
             var query = context.Authors as IQueryable<Author>;
 
             if (!string.IsNullOrEmpty(authorParms.MainCategory))
@@ -122,7 +136,36 @@ namespace Full.Pirate.Library.Services
                 query = query.CreateSort(mappingDetails, authorParms.OrderBy);
             }
 
-            return PagedList<Author>.Create(query,
+            return  PagedList<Author>.Create(query,
+                authorParms.PageNumber,
+                authorParms.PageSize);
+        }
+
+        public async Task<PagedList<Author>> GetAuthorsAsync(AuthorsResourceParameters authorParms)
+        {
+            await context.Database.ExecuteSqlCommandAsync("WAITFOR DELAY '00:00:02';");
+            var query = context.Authors as IQueryable<Author>;
+
+            if (!string.IsNullOrEmpty(authorParms.MainCategory))
+            {
+                query = query.Where(a => a.MainCategory == authorParms.MainCategory.Trim());
+            }
+            if (!string.IsNullOrEmpty(authorParms.SearchQuery))
+            {
+                var searchQuery = authorParms.SearchQuery.Trim();
+                query = query.Where(a => a.MainCategory.Contains(searchQuery)
+                                        || a.FirstName.Contains(searchQuery)
+                                        || a.LastName.Contains(searchQuery)
+                                    );
+            }
+
+            if (!string.IsNullOrEmpty(authorParms.OrderBy))
+            {
+                var mappingDetails = propertyMappingService.GetPropertyMapping<Models.AuthorDto, Author>();
+                query = query.CreateSort(mappingDetails, authorParms.OrderBy);
+            }
+
+            return await PagedList<Author>.CreateAsync(query,
                 authorParms.PageNumber,
                 authorParms.PageSize);
         }
@@ -182,6 +225,24 @@ namespace Full.Pirate.Library.Services
         public void UpdateBook(Book book)
         {
           //  throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing) {
+
+                if (context != null)
+                {
+                    context.Dispose();
+                    context = null;
+                }
+            }
         }
     }
 }
