@@ -1,5 +1,7 @@
-﻿using AutoMapper;
+﻿//#undef TESTING_BANDWIDTH
+using AutoMapper;
 using Full.Pirate.Library.Entities;
+using Full.Pirate.Library.Filters;
 using Full.Pirate.Library.Helpers;
 using Full.Pirate.Library.Models;
 using Full.Pirate.Library.SearchParams;
@@ -34,6 +36,7 @@ namespace Full.Pirate.Library.Controllers
             this.dataShapeValidatorService = dataShapeValidator ?? throw new ArgumentNullException(nameof(dataShapeValidator));
         }
 
+#if (!TESTING_BANDWIDTH)
         [HttpGet(Name = "GetAuthorsAsync")]
         [HttpHead]
         public async Task<IActionResult> GetAuthorsAsync(
@@ -53,7 +56,17 @@ namespace Full.Pirate.Library.Controllers
             this.Response.Headers.Add("X-Pagination", CreatePaginationHeader(authors, authorParms));
             return Ok(mapper.Map<IEnumerable<AuthorDto>>(authors).ShapeData(authorParms.Fields));
         }
+#endif
+#if (TESTING_BANDWIDTH)
+        [HttpGet]
+        [AuthorsResultFilter]
+        public async Task<IActionResult> GetAuthorsAsync()
+        {
+            var authors = await service.GetAuthorsAsync();
 
+            return Ok(authors);
+        }
+#endif
         [HttpGet("{authorId}", Name = "GetAuthorAsync")]
         [HttpHead("{authorId}")]
         public async Task<ActionResult<AuthorDto>> GetAuthorAsync(Guid authorId, string fields)

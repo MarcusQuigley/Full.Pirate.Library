@@ -1,6 +1,7 @@
-﻿
+﻿//#undef TESTING_BANDWIDTH
 using AutoMapper;
 using Full.Pirate.Library.Entities;
+using Full.Pirate.Library.Filters;
 using Full.Pirate.Library.Helpers;
 using Full.Pirate.Library.Models;
 using Full.Pirate.Library.SearchParams;
@@ -40,6 +41,7 @@ namespace Full.Pirate.Library.Controllers
             this.dataShapeValidatorService = dataShapeValidator ?? throw new ArgumentNullException(nameof(dataShapeValidator));
         }
 
+#if (!TESTING_BANDWIDTH)
         [HttpGet(Name = "GetAuthors")]
         [HttpHead]
         public IActionResult GetAuthors(
@@ -54,12 +56,23 @@ namespace Full.Pirate.Library.Controllers
             {
                 return BadRequest();
             }
-            var authors =  service.GetAuthors(authorParms);
+            var authors = service.GetAuthors(authorParms);
 
             this.Response.Headers.Add("X-Pagination", CreatePaginationHeader(authors, authorParms));
             return Ok(mapper.Map<IEnumerable<AuthorDto>>(authors).ShapeData(authorParms.Fields));
         }
- 
+#endif
+
+#if (TESTING_BANDWIDTH)
+        [HttpGet]
+        [AuthorResultFilter]
+        public IActionResult GetAuthors()
+        {
+            var authors = service.GetAuthors();
+            //  return Ok(mapper.Map<IEnumerable<AuthorDto>>(authors));
+            return Ok(authors);
+        }
+#endif
         [HttpGet("{authorId}",Name ="GetAuthor")]
         [HttpHead("{authorId}")]
         public ActionResult<AuthorDto> GetAuthor(Guid authorId, string fields)

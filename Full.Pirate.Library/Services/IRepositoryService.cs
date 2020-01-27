@@ -16,8 +16,7 @@ namespace Full.Pirate.Library.Services
         PagedList<Author> GetAuthors(AuthorsResourceParameters authorParms);
         Task<Author> GetAuthorAsync(Guid authorId);
         Task<PagedList<Author>> GetAuthorsAsync(AuthorsResourceParameters authorParms);
-        //PagedList<Author> GetAuthors(AuthorsResourceParameters authorParms);
-        
+        Task<IEnumerable<Author>> GetAuthorsAsync();
         IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds);
         void AddAuthor(Author author);
 

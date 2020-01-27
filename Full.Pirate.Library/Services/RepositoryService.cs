@@ -1,4 +1,5 @@
-﻿using Full.Pirate.Library.DbContexts;
+﻿//#undef TESTING_BANDWIDTH
+using Full.Pirate.Library.DbContexts;
 using Full.Pirate.Library.Entities;
 using Full.Pirate.Library.Helpers;
 using Full.Pirate.Library.SearchParams;
@@ -13,7 +14,7 @@ namespace Full.Pirate.Library.Services
 {
     public class RepositoryService : IRepositoryService, IDisposable
     {
-          PirateLibraryContext context;
+        PirateLibraryContext context;
         readonly IPropertyMappingService propertyMappingService;
         public RepositoryService(PirateLibraryContext context , IPropertyMappingService propertyMappingService)
         {
@@ -105,16 +106,22 @@ namespace Full.Pirate.Library.Services
 
         public IEnumerable<Author> GetAuthors()
         {
+#if TESTING_BANDWIDTH
+
+            context.Database.ExecuteSqlRaw("WAITFOR DELAY '00:00:02';");
+#endif
             return context.Authors;
         }
         public async Task<IEnumerable<Author>> GetAuthorsAsync()
         {
+#if TESTING_BANDWIDTH
+            await context.Database.ExecuteSqlRawAsync("WAITFOR DELAY '00:00:02';");
+#endif
             return await context.Authors.ToArrayAsync();
         }
 
         public  PagedList<Author> GetAuthors(AuthorsResourceParameters authorParms)
         {
-            context.Database.ExecuteSqlCommand("WAITFOR DELAY '00:00:02';");
             var query = context.Authors as IQueryable<Author>;
 
             if (!string.IsNullOrEmpty(authorParms.MainCategory))
@@ -143,7 +150,7 @@ namespace Full.Pirate.Library.Services
 
         public async Task<PagedList<Author>> GetAuthorsAsync(AuthorsResourceParameters authorParms)
         {
-            await context.Database.ExecuteSqlCommandAsync("WAITFOR DELAY '00:00:02';");
+            
             var query = context.Authors as IQueryable<Author>;
 
             if (!string.IsNullOrEmpty(authorParms.MainCategory))
